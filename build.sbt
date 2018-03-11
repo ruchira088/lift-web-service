@@ -9,13 +9,21 @@ lazy val root = (project in file("."))
     name := "lift-web",
     libraryDependencies ++= Seq(
       liftWebkit,
+      scalaZ,
+      akkaActor,
+      slick, slickHikariCp, postgres,
+      jodaTime,
+      slf4jNop,
 
       scalaTest % Test,
       pegdown % Test
-    )
+    ),
+    buildInfoKeys := Seq[BuildInfoKey](name, scalaVersion, sbtVersion),
+    buildInfoPackage := "com.eed3si9n"
   )
 
 enablePlugins(JettyPlugin)
+enablePlugins(BuildInfoPlugin)
 
 coverageEnabled := true
 
