@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+
+  lift-web:
+    build: .
+    ports:
+      - 5005:5005
+    volumes:
+      - "~/.sbt:/root/.sbt"
+      - "~/.ivy2:/root/.ivy2"
+      - ".:/opt/lift-web"
+      - "/opt/lift-web/target"
+      - "/opt/lift-web/project/target"
