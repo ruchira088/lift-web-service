@@ -2,13 +2,26 @@ version: "3"
 
 services:
 
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "my-users"
+
   lift-web:
     build: .
     ports:
-      - 5005:5005
+      - 8080:8080
     volumes:
       - "~/.sbt:/root/.sbt"
       - "~/.ivy2:/root/.ivy2"
       - ".:/opt/lift-web"
       - "/opt/lift-web/target"
       - "/opt/lift-web/project/target"
+    environment:
+      POSTGRES_URL: "jdbc:postgresql://postgres:5432/my-users"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "password"

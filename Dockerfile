@@ -10,10 +10,8 @@ RUN echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.lis
 
 WORKDIR /opt/lift-web
 
-EXPOSE 5005
+EXPOSE 8080
 
 COPY . .
 
-ENTRYPOINT ["sbt"]
-
-CMD ["-jvm-debug", "5005", "run"]
+ENTRYPOINT ["sbt", "~jetty:start"]

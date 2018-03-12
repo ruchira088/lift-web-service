@@ -10,6 +10,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       liftWebkit,
       scalaZ,
+      liftMapper,
       akkaActor,
       slick, slickHikariCp, postgres,
       jodaTime,

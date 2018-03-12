@@ -12,6 +12,8 @@ object Dependencies
 
   lazy val postgres = "org.postgresql" % "postgresql" % "42.2.1"
 
+  lazy val liftMapper = "net.liftweb" %% "lift-mapper" % "3.2.0"
+
   lazy val akkaActor = "com.typesafe.akka" %% "akka-actor" % "2.5.11"
 
   lazy val slf4jNop = "org.slf4j" % "slf4j-nop" % "1.6.4"
