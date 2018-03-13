@@ -14,4 +14,5 @@ EXPOSE 8080
 
 COPY . .
 
+#ENTRYPOINT ["sbt", "run"]
 ENTRYPOINT ["sbt", "~jetty:start"]

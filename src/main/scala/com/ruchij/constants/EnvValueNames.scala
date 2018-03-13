@@ -2,7 +2,11 @@ package com.ruchij.constants
 
 object EnvValueNames
 {
-  val POSTGRES_URL = "POSTGRES_URL"
+  val POSTGRES_SERVER = "POSTGRES_SERVER"
+
+  val POSTGRES_PORT = "POSTGRES_PORT"
+
+  val POSTGRES_DB = "POSTGRES_DB"
 
   val POSTGRES_USER = "POSTGRES_USER"
 

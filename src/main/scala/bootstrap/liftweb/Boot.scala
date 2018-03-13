@@ -1,13 +1,11 @@
 package bootstrap.liftweb
 
-import java.util.concurrent.Executors
-
 import akka.actor.ActorSystem
 import com.eed3si9n.BuildInfo
 import com.ruchij.constants.EnvValueNames._
 import com.ruchij.daos.{DatabaseConnectionManager, MapperUser}
 import com.ruchij.utils.ConfigUtils._
-import com.ruchij.web.routes.{IndexRoute, UserRoute}
+import com.ruchij.web.routes.IndexRoute
 import net.liftweb.db.DB
 import net.liftweb.mapper.Schemifier
 import net.liftweb.util.DefaultConnectionIdentifier
@@ -17,49 +15,41 @@ import scala.util.Try
 
 class Boot
 {
-  def boot =
-  {
-//    implicit val actorSystem: ActorSystem = ActorSystem("hello-world")
-//    implicit val executionContext: ExecutionContext = actorSystem.dispatcher
-//
-//    implicit val executionContext = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(10))
+  def postgresUrl(host: String, port: Int, name: String) =
+    s"jdbc:postgresql://$host:$port/$name"
 
-    println("Hello World")
-    IndexRoute.init()
+  def boot(): Unit =
+    Try {
+      implicit val actorSystem: ActorSystem = ActorSystem(BuildInfo.name)
+      implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
-    val connectionManager: Try[DatabaseConnectionManager] =
-      for {
-        databaseUrl <- envValue(POSTGRES_URL)
-        user <- envValue(POSTGRES_USER)
-        password <- envValue(POSTGRES_PASSWORD)
-      }
-      yield DatabaseConnectionManager.postgres(databaseUrl, user, password)
+      IndexRoute.init()
 
-    DB.defineConnectionManager(
-      DefaultConnectionIdentifier,
-      connectionManager.get
-    )
+      val connectionManager: Try[DatabaseConnectionManager] =
+        for {
+          host <- envValue(POSTGRES_SERVER)
+          port <- envValue(POSTGRES_PORT).flatMap(portString => Try(portString.toInt))
+          name <- envValue(POSTGRES_DB)
+          user <- envValue(POSTGRES_USER)
+          password <- envValue(POSTGRES_PASSWORD)
+        }
+        yield DatabaseConnectionManager.postgres(postgresUrl(host, port, name), user, password)
 
-    println("Here")
+      DB.defineConnectionManager(
+        DefaultConnectionIdentifier,
+        connectionManager.get
+      )
 
-    Schemifier.schemify(true, Schemifier.infoF _, MapperUser)
+      Schemifier.schemify(true, Schemifier.infoF _, MapperUser)
 
-    println("Here 1")
-
-    val user = MapperUser.create
-
-    println(user)
-
-    println(Try{
-      user
+      MapperUser.create
         .username("sample-username")
         .email("ruchira088@gmail.com")
+        .save()
+
     }
-    )
-    println("Here 2")
-
-    user.save()
-
-    println("Success")
-  }
+      .fold(
+        exception => System.err.println(exception.getMessage),
+        _ => println("Successfully started LiftWeb application.")
+      )
 }

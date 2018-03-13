@@ -7,6 +7,7 @@ import org.joda.time.DateTime
 import slick.ast.BaseTypedType
 import slick.jdbc.JdbcType
 import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.meta.MTable
 
 import scala.concurrent.{ExecutionContext, Future}
 import scalaz.OptionT

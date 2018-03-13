@@ -22,6 +22,8 @@ services:
       - "/opt/lift-web/target"
       - "/opt/lift-web/project/target"
     environment:
-      POSTGRES_URL: "jdbc:postgresql://postgres:5432/my-users"
+      POSTGRES_DB: "my-users"
       POSTGRES_USER: "admin"
       POSTGRES_PASSWORD: "password"
+      POSTGRES_SERVER: "postgres"
+      POSTGRES_PORT: "5432"
