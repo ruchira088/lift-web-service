@@ -2,19 +2,16 @@ package bootstrap.liftweb
 
 import akka.actor.ActorSystem
 import com.eed3si9n.BuildInfo
-import com.ruchij.constants.EnvValueNames._
-import com.ruchij.daos.{DatabaseConnectionManager, MapperUser}
-import com.ruchij.utils.ConfigUtils._
+import com.ruchij.daos.{DatabaseConnectionManager, LiftMapperUserDao, UserDao}
+import com.ruchij.models.User
 import com.ruchij.web.routes.IndexRoute
-import net.liftweb.db.DB
-import net.liftweb.mapper.Schemifier
-import net.liftweb.util.DefaultConnectionIdentifier
+import org.joda.time.DateTime
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
 import scala.util.Try
 
-class Boot
-{
+class Boot {
   def postgresUrl(host: String, port: Int, name: String) =
     s"jdbc:postgresql://$host:$port/$name"
 
@@ -25,31 +22,24 @@ class Boot
 
       IndexRoute.init()
 
-      val connectionManager: Try[DatabaseConnectionManager] =
-        for {
-          host <- envValue(POSTGRES_SERVER)
-          port <- envValue(POSTGRES_PORT).flatMap(portString => Try(portString.toInt))
-          name <- envValue(POSTGRES_DB)
-          user <- envValue(POSTGRES_USER)
-          password <- envValue(POSTGRES_PASSWORD)
-        }
-        yield DatabaseConnectionManager.postgres(postgresUrl(host, port, name), user, password)
+      val result = for {
+        userDao: UserDao <- liftMapperUserDao()
+        user <- userDao.insert(User("my-sample-id", DateTime.now(), "ruchira", None, "something"))
+      }
+      yield user
 
-      DB.defineConnectionManager(
-        DefaultConnectionIdentifier,
-        connectionManager.get
-      )
-
-      Schemifier.schemify(true, Schemifier.infoF _, MapperUser)
-
-      MapperUser.create
-        .username("sample-username")
-        .email("ruchira088@gmail.com")
-        .save()
-
+      Await.ready(result, 1 minute)
     }
       .fold(
         exception => System.err.println(exception.getMessage),
         _ => println("Successfully started LiftWeb application.")
       )
+
+  def liftMapperUserDao()(implicit executionContext: ExecutionContext): Future[LiftMapperUserDao] =
+    for {
+      databaseConnectionManager <- Future.fromTry(DatabaseConnectionManager.postgres())
+      liftMapperUserDao = LiftMapperUserDao(databaseConnectionManager)
+      _ <- liftMapperUserDao.init()
+    }
+      yield liftMapperUserDao
 }
