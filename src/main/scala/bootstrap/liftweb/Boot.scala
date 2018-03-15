@@ -10,6 +10,8 @@ import org.joda.time.DateTime
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.util.Try
+import scalaz.OptionT
+import scalaz.std.scalaFuture._
 
 class Boot {
   def postgresUrl(host: String, port: Int, name: String) =
@@ -23,15 +25,21 @@ class Boot {
       IndexRoute.init()
 
       val result = for {
-        userDao: UserDao <- liftMapperUserDao()
-        user <- userDao.insert(User("my-sample-id", DateTime.now(), "ruchira", None, "something"))
+        userDao <- OptionT {
+          liftMapperUserDao().map[Option[UserDao]](Some(_))
+        }
+
+        user <- userDao.getByUsername("ruchira")
       }
       yield user
 
-      Await.ready(result, 1 minute)
+      println(Await.result(result.run, 1 minute))
     }
       .fold(
-        exception => System.err.println(exception.getMessage),
+        exception => {
+          System.err.println(exception.getMessage)
+          System.exit(1)
+        },
         _ => println("Successfully started LiftWeb application.")
       )
 

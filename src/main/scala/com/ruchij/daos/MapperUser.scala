@@ -14,6 +14,7 @@ class MapperUser extends LongKeyedMapper[MapperUser]
   object id extends MappedString(self, 100)
   object timeStamp extends MappedDateTime(self)
   object username extends MappedString(self, 100)
+  object password extends MappedString(self, 200)
   object email extends MappedString(self, 100)
 }
 
