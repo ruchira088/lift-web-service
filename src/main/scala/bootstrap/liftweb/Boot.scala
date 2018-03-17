@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.eed3si9n.BuildInfo
 import com.ruchij.daos.{DatabaseConnectionManager, LiftMapperUserDao, UserDao}
 import com.ruchij.models.User
-import com.ruchij.web.routes.IndexRoute
+import com.ruchij.web.routes.{IndexRoute, UserRoute}
 import org.joda.time.DateTime
 
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,17 +23,18 @@ class Boot {
       implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
       IndexRoute.init()
+      UserRoute.init()
 
-      val result = for {
-        userDao <- OptionT {
-          liftMapperUserDao().map[Option[UserDao]](Some(_))
-        }
-
-        user <- userDao.getByUsername("ruchira")
-      }
-      yield user
-
-      println(Await.result(result.run, 1 minute))
+//      val result = for {
+//        userDao <- OptionT {
+//          liftMapperUserDao().map[Option[UserDao]](Some(_))
+//        }
+//
+//        user <- userDao.getByUsername("ruchira")
+//      }
+//      yield user
+//
+//      println(Await.result(result.run, 1 minute))
     }
       .fold(
         exception => {

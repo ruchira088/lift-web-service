@@ -12,7 +12,8 @@ import org.joda.time.DateTime
 import scala.concurrent.{ExecutionContext, Future}
 import scalaz.OptionT
 
-class LiftMapperUserDao(databaseConnectionManager: DatabaseConnectionManager)(implicit executionContext: ExecutionContext) extends UserDao
+class LiftMapperUserDao(databaseConnectionManager: DatabaseConnectionManager)(implicit executionContext: ExecutionContext)
+  extends UserDao
 {
   override def insert(user: User): Future[User] =
     for {
