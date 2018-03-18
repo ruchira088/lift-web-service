@@ -5,7 +5,7 @@ import net.liftweb.json.{Extraction, JsonParser}
 import org.joda.time.DateTime
 
 case class AuthenticationToken(
-    id: String,
+    bearerToken: String,
     userId: String,
     expiryTimestamp: DateTime
 )

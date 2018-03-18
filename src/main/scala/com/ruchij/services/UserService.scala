@@ -10,9 +10,8 @@ import org.joda.time.DateTime
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserService(userDao: UserDao, passwordHashingService: PasswordHashingService)
-                 (implicit executionContext: ExecutionContext)
 {
-  def newUser(userRequest: UserRequest): Future[User] =
+  def newUser(userRequest: UserRequest)(implicit executionContext: ExecutionContext): Future[User] =
     for {
       hashedPassword <- passwordHashingService.hash(userRequest.password)
 
@@ -30,7 +29,6 @@ class UserService(userDao: UserDao, passwordHashingService: PasswordHashingServi
 
 object UserService
 {
-  def apply(userDao: UserDao, passwordHashingService: PasswordHashingService)
-           (implicit executionContext: ExecutionContext): UserService =
+  def apply(userDao: UserDao, passwordHashingService: PasswordHashingService): UserService =
     new UserService(userDao, passwordHashingService)
 }
