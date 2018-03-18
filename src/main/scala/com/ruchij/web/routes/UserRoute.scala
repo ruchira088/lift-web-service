@@ -1,22 +1,34 @@
 package com.ruchij.web.routes
 
+import com.ruchij.constants.ConfigValues
+import com.ruchij.services.UserService
 import com.ruchij.web.requests.UserRequest
 import com.ruchij.web.responses.UserResponse
 import net.liftweb.http.{JsonResponse, LiftRules}
 import net.liftweb.http.rest.RestHelper
 
-object UserRoute extends RestHelper
+import scala.concurrent.{Await, ExecutionContext}
+
+class UserRoute(userService: UserService)(implicit executionContext: ExecutionContext)
+  extends RestHelper
 {
-  def init() =
-  {
-    LiftRules.statelessDispatch.append(UserRoute)
-  }
-
   serve {
-    case "user" :: Nil JsonPost UserRequest(request) -> _ => {
+    case "user" :: Nil JsonPost UserRequest(request) -> _ =>
+      Await.result(
+        for {
+          user <- userService.newUser(request)
+          response = JsonResponse(UserResponse.fromUser(user))
+        }
+        yield response,
+        ConfigValues.FUTURE_TIMEOUT
+      )
+  }
+}
 
-      println(request)
-      JsonResponse(UserResponse("my-id", "username", "email"))
-    }
+object UserRoute
+{
+  def init(userService: UserService)(implicit executionContext: ExecutionContext) =
+  {
+    LiftRules.statelessDispatch.append(new UserRoute(userService))
   }
 }

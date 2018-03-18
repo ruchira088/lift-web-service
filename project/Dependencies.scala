@@ -20,6 +20,8 @@ object Dependencies
 
   lazy val jodaTime = "joda-time" % "joda-time" % "2.9.9"
 
+  lazy val bCrypt = "org.mindrot" % "jbcrypt" % "0.4"
+
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4"
 
   lazy val pegdown = "org.pegdown" % "pegdown" % "1.6.0"

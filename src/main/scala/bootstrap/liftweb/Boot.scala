@@ -1,17 +1,17 @@
 package bootstrap.liftweb
 
-import akka.actor.ActorSystem
-import com.eed3si9n.BuildInfo
-import com.ruchij.daos.{DatabaseConnectionManager, LiftMapperUserDao, UserDao}
-import com.ruchij.models.User
-import com.ruchij.web.routes.{IndexRoute, UserRoute}
-import org.joda.time.DateTime
+import java.util.concurrent.Executors
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import com.ruchij.constants.ConfigValues
+import com.ruchij.daos.{DatabaseConnectionManager, LiftMapperUserDao}
+import com.ruchij.ecs.BlockingExecutionContext
+import com.ruchij.services.UserService
+import com.ruchij.services.hashing.BCryptPasswordHashingService
+import com.ruchij.web.routes.{IndexRoute, UserRoute}
+
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutorService, Future}
 import scala.concurrent.duration._
 import scala.util.Try
-import scalaz.OptionT
-import scalaz.std.scalaFuture._
 
 class Boot {
   def postgresUrl(host: String, port: Int, name: String) =
@@ -19,22 +19,26 @@ class Boot {
 
   def boot(): Unit =
     Try {
-      implicit val actorSystem: ActorSystem = ActorSystem(BuildInfo.name)
-      implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+      implicit val executionContext: ExecutionContextExecutorService =
+        ExecutionContext.fromExecutorService {
+          Executors.newFixedThreadPool(ConfigValues.DEFAULT_EXECUTION_CONTEXT_THREAD_POOL_SIZE)
+        }
+      val blockingExecutionContext: BlockingExecutionContext = BlockingExecutionContext()
 
-      IndexRoute.init()
-      UserRoute.init()
+      val passwordHashingService = BCryptPasswordHashingService()(blockingExecutionContext)
 
-//      val result = for {
-//        userDao <- OptionT {
-//          liftMapperUserDao().map[Option[UserDao]](Some(_))
-//        }
-//
-//        user <- userDao.getByUsername("ruchira")
-//      }
-//      yield user
-//
-//      println(Await.result(result.run, 1 minute))
+      val result = for {
+        userDao <- liftMapperUserDao()
+
+        userService = UserService(userDao, passwordHashingService)
+        _ = {
+          IndexRoute.init()
+          UserRoute.init(userService)
+        }
+      }
+      yield (): Unit
+
+      println(Await.result(result, 1 minute))
     }
       .fold(
         exception => {

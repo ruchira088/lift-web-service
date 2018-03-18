@@ -15,6 +15,7 @@ lazy val root = (project in file("."))
       slick, slickHikariCp, postgres,
       jodaTime,
       slf4jNop,
+      bCrypt,
 
       scalaTest % Test,
       pegdown % Test
