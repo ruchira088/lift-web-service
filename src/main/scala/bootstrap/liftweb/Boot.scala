@@ -27,18 +27,20 @@ class Boot {
 
       val passwordHashingService = BCryptPasswordHashingService()(blockingExecutionContext)
 
-      val result = for {
-        userDao <- liftMapperUserDao()
+      val result =
+        for {
+          userDao <- liftMapperUserDao()
 
-        userService = UserService(userDao, passwordHashingService)
-        _ = {
-          IndexRoute.init()
-          UserRoute.init(userService)
+          userService = UserService(userDao, passwordHashingService)
+
+          _ = {
+            IndexRoute.init()
+            UserRoute.init(userService)
+          }
         }
-      }
-      yield (): Unit
+        yield (): Unit
 
-      println(Await.result(result, 1 minute))
+      Await.ready(result, ConfigValues.FUTURE_TIMEOUT)
     }
       .fold(
         exception => {
