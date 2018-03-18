@@ -16,6 +16,7 @@ lazy val root = (project in file("."))
       jodaTime,
       slf4jNop,
       bCrypt,
+      rediscala,
 
       scalaTest % Test,
       pegdown % Test

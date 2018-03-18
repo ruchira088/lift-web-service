@@ -1,4 +1,4 @@
-package com.ruchij.web.utils
+package com.ruchij.utils
 
 import net.liftweb.json.DefaultFormats
 

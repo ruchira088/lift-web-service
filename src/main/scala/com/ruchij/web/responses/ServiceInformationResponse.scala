@@ -15,7 +15,7 @@ case class ServiceInformationResponse(
 object ServiceInformationResponse
 {
   import com.eed3si9n.BuildInfo._
-  import com.ruchij.web.utils.Serializers._
+  import com.ruchij.utils.Serializers._
 
   def apply(): ServiceInformationResponse =
     ServiceInformationResponse(name, sbtVersion, scalaVersion, Properties.javaVersion)

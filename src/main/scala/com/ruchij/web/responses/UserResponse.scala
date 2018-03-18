@@ -7,7 +7,7 @@ case class UserResponse(id: String, username: String, email: String)
 
 object UserResponse
 {
-  import com.ruchij.web.utils.Serializers._
+  import com.ruchij.utils.Serializers._
 
   def fromUser(user: User): UserResponse =
     UserResponse(user.id, user.username, user.email)

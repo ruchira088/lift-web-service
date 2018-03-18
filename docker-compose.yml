@@ -11,12 +11,18 @@ services:
       POSTGRES_PASSWORD: "password"
       POSTGRES_DB: "my-users"
 
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+
   lift-web:
     build: .
     ports:
       - 8080:8080
     depends_on:
       - postgres
+      - redis
     volumes:
       - "~/.sbt:/root/.sbt"
       - "~/.ivy2:/root/.ivy2"
@@ -29,3 +35,5 @@ services:
       POSTGRES_PASSWORD: "password"
       POSTGRES_SERVER: "postgres"
       POSTGRES_PORT: "5432"
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"

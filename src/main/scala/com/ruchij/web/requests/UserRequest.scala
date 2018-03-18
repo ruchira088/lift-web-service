@@ -7,7 +7,7 @@ case class UserRequest(username: String, password: String, email: String)
 
 object UserRequest
 {
-  import com.ruchij.web.utils.Serializers._
+  import com.ruchij.utils.Serializers._
 
   implicit def toJValue(userRequest: UserRequest): JValue =
     Extraction.decompose(userRequest)

@@ -2,6 +2,7 @@ package com.ruchij.daos
 
 import java.sql.{Connection, DriverManager}
 
+import com.ruchij.Environment
 import com.ruchij.constants.EnvValueNames._
 import com.ruchij.utils.ConfigUtils.envValue
 import net.liftweb.common.{Box, Full}
@@ -31,7 +32,7 @@ object DatabaseConnectionManager
   private def postgresUrl(host: String, port: Int, name: String) =
     s"jdbc:postgresql://$host:$port/$name"
 
-  def postgres(): Try[DatabaseConnectionManager] =
+  def postgres()(implicit environment: Environment): Try[DatabaseConnectionManager] =
     for {
       host <- envValue(POSTGRES_SERVER)
       port <- envValue(POSTGRES_PORT).flatMap(portString => Try(portString.toInt))

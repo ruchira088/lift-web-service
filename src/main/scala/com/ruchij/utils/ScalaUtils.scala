@@ -1,6 +1,8 @@
 package com.ruchij.utils
 
-import scala.concurrent.Future
+import scalaz.OptionT
+
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 object ScalaUtils
@@ -13,4 +15,9 @@ object ScalaUtils
 
   implicit def fromTry[A](tryValue: Try[A]): Future[A] =
     Future.fromTry(tryValue)
+
+  implicit def fromFuture[A](future: Future[A])(implicit executionContext: ExecutionContext): OptionT[Future, A] =
+    OptionT {
+      future.map(Option(_))
+    }
 }

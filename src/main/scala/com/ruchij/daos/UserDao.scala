@@ -11,5 +11,5 @@ trait UserDao
 
   def getByUsername(id: String): OptionT[Future, User]
 
-  def init(): Future[_] = Future.successful((): Unit)
+  def init(): Future[_] = Future.successful()
 }

@@ -2,6 +2,7 @@ package bootstrap.liftweb
 
 import java.util.concurrent.Executors
 
+import com.ruchij.Environment
 import com.ruchij.constants.ConfigValues
 import com.ruchij.daos.{DatabaseConnectionManager, LiftMapperUserDao}
 import com.ruchij.ecs.BlockingExecutionContext
@@ -10,7 +11,6 @@ import com.ruchij.services.hashing.BCryptPasswordHashingService
 import com.ruchij.web.routes.{IndexRoute, UserRoute}
 
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutorService, Future}
-import scala.concurrent.duration._
 import scala.util.Try
 
 class Boot {
@@ -23,6 +23,8 @@ class Boot {
         ExecutionContext.fromExecutorService {
           Executors.newFixedThreadPool(ConfigValues.DEFAULT_EXECUTION_CONTEXT_THREAD_POOL_SIZE)
         }
+      implicit val environment: Environment = sys.env
+
       val blockingExecutionContext: BlockingExecutionContext = BlockingExecutionContext()
 
       val passwordHashingService = BCryptPasswordHashingService()(blockingExecutionContext)
@@ -50,7 +52,7 @@ class Boot {
         _ => println("Successfully started LiftWeb application.")
       )
 
-  def liftMapperUserDao()(implicit executionContext: ExecutionContext): Future[LiftMapperUserDao] =
+  def liftMapperUserDao()(implicit environment: Environment, executionContext: ExecutionContext): Future[LiftMapperUserDao] =
     for {
       databaseConnectionManager <- Future.fromTry(DatabaseConnectionManager.postgres())
       liftMapperUserDao = LiftMapperUserDao(databaseConnectionManager)

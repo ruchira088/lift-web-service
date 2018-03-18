@@ -22,6 +22,8 @@ object Dependencies
 
   lazy val bCrypt = "org.mindrot" % "jbcrypt" % "0.4"
 
+  lazy val rediscala = "com.github.etaty" %% "rediscala" % "1.8.0"
+
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.4"
 
   lazy val pegdown = "org.pegdown" % "pegdown" % "1.6.0"
